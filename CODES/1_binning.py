@@ -1,4 +1,4 @@
-# %% ------------------------------------------ PREAMBL
+# %% -----------------------------------------------------
 ##########################################################
 ##########################################################
 ##########################################################
@@ -219,7 +219,7 @@ for angle in angle_list:
 
 
         center_points = [] 
-        ######### -1 because the rotated_xx -and yy values are the BOUNDARIES of the grid cells, and the center points related to the actual number of bins
+        
         for i in range(NlinesY - 1):
                 for j in range(NlinesX  - 1):
                     center_point = fm.compute_center_point(rotated_xx[i, j],rotated_yy[i, j], rotated_xx[i+1, j], rotated_yy[i+1, j], rotated_xx[i+1, j+1], rotated_yy[i+1, j+1], rotated_xx[i, j+1], rotated_yy[i, j+1])                                 
@@ -228,9 +228,9 @@ for angle in angle_list:
 
         #------------------------------------------ PLOTTING OF GRID 
 
-        ####### BOUNDARIES ARE PLOTTED WITH BLUE COLORS, 
-        ####### NUMBERS ARE MIDPOINT OF CELLS!!! 
-        ####### map will be saved in path_results_tmp folder
+        ####### Boundaries of cells are plotted with blue color
+        ####### Numbers are plotted at midpoints of cells
+        ####### Map will be saved in path_results_tmp folder
 
         ### Plotting
         if plotMap: 
