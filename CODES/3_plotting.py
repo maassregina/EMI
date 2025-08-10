@@ -13,34 +13,26 @@ import functions_migration as fm
 import numpy as np 
 import pandas as pd
 import math
+import numpy as np
 
-import obspy 
-from obspy import read, Trace, Stream
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import matplotlib
-import matplotlib.image as mpimg
 matplotlib.rc('font', size=25)
 matplotlib.rc('xtick', labelsize=20) 
 matplotlib.rc('ytick', labelsize=20) 
-import matplotlib.patches as patches
-import matplotlib.image as img 
 
-import vtk
-import pyvista as pv
-import numpy as np
-from scipy.signal import hilbert
+
 
 
 def plot_grid(iterLine, imageAlong, ax1, individualEvent = None, fold = [], depthIdxFold = 0, cmap = 'Greys', plotEarthquakes = True, coordsTransform = [5.47956943, 4.16858575], angle = -7):
-    ### Plotting
+    
+    ### Plotting of map
     mapname = 'GridIncr' + str(gridIncX) + '-' + str(gridIncY)
 
     transX = coordsTransform[0]
     transY = coordsTransform[1]
 
-    # gs = gridspec.GridSpec(4, 2, figure=fig)
-    # ax1 = fig.add_subplot(gs[0:4, 0])
 
     ax1.plot(stX - transX, stY - transY,'ko', alpha = 0.6, markersize = 60)
     ax1.plot(xIDDP[0]- transX, yIDDP[0] - transY,'yo', alpha = 1, markersize = 140)
@@ -93,7 +85,6 @@ def plot_grid(iterLine, imageAlong, ax1, individualEvent = None, fold = [], dept
         y_rect = [ymin, ymin, ymax, ymax]
 
         x_rect_rot, y_rect_rot = fm.rotate_point((x_rect, y_rect), angle, refCoords = (xRef, yRef))
-      #  ax1.fill_betweenx([ymin, ymax], xmin, xmax, color='green', alpha=1)
         ax1.fill(x_rect_rot - transX, y_rect_rot - transY, color='b', alpha=0.4,edgecolor = 'k', label='Shaded Area')  # Fill area
         
 
@@ -114,7 +105,7 @@ def plot_vertical_cross_section(matrix, iterLine, freqRange, scaFac = 1, figsize
     if figsize == None:
         figsize = (40,15)
     fig = plt.figure(figsize=figsize)
-  #  if Nlines <= 35:
+
     gs = gridspec.GridSpec(4, 10, figure=fig)
     ax1 = fig.add_subplot(gs[0:4, 0:4])
     ax = fig.add_subplot(gs[0:4, 4:7])
@@ -133,19 +124,15 @@ def plot_vertical_cross_section(matrix, iterLine, freqRange, scaFac = 1, figsize
     ax1.set_xlim(map_limits[0])
     ax1.set_ylim(map_limits[1])
    
-    #count = p0
-    #xLim_list = []
 
     for iterBin in range(Nlines):
         count = xLim_list[iterBin]
         amplitudes = matrix[:, iterBin]
 
         if len(amplitudes) == 0: 
-          #  ax.plot(np.nan, np.nan + count)
             ax.plot(count, np.nan, 'X', lw = 2)
 
         else:
-    # amplitudes /= max(abs(amplitudes)) 
             amplitudes = amplitudes/scaFac
             amplitudes += count
 
@@ -245,8 +232,8 @@ modelSpaceLimits = [[4.5,7.2], [2.6, 5]]
 
 ### grid increment - can be several (e.g., [0.1, 0.07]), code will loop over grid increments
 ### define grid increment and angle
-gridIncX = 0.1
-gridIncY = 0.1
+gridIncX = 0.07
+gridIncY = 0.07
 
 
 ### rotation angle of the grid  - can be several (e.g., [-7, 40]), code will loop over grid increments)
@@ -271,19 +258,18 @@ x1 = rotated_xx[0][-1]
 y0 = rotated_yy[0][0]
 y1 = rotated_yy[0][-1]        
 
-######### -1 because the rotated_xx -and yy values are the BOUNDARIES of the grid cells, and the center points related to the actual number of bins
+###
 Nlines_x = rotated_xx.shape[1] - 1
 Nlines_y = rotated_xx.shape[0] -1
 NbinsAll = (Nlines_x * Nlines_y)
 offsets_x = np.linspace(x0, x1,Nlines_x)
 
-#plotLines = [int(round(x_target_offset/ gridIncX)) for x_target_offset in x_target_offset_list]
 
 center_points = [] 
 center_points_XX = np.zeros((Nlines_y, Nlines_x))
 center_points_YY = np.zeros((Nlines_y, Nlines_x))
 
-######### -1 because the rotated_xx -and yy values are the BOUNDARIES of the grid cells, and the center points related to the actual number of bins
+###
 for i in range(Nlines_y):
         for j in range(Nlines_x):
             center_point = fm.compute_center_point(rotated_xx[i, j],rotated_yy[i, j], rotated_xx[i+1, j], rotated_yy[i+1, j], rotated_xx[i+1, j+1], rotated_yy[i+1, j+1], rotated_xx[i, j+1], rotated_yy[i, j+1])                                 
@@ -307,9 +293,7 @@ colorMode = 'k' # 'k' or 'r'
 figsize = (120,70)
 yLim = [3.5, 1.5]
 xLim = [-1,1]
-scaFac = 10 ### scaling for wiggle
-
-#xLim = None
+scaFac = 10 ### scaling for wiggle plot
 perc_ampl = 99.4 ### scaling for pcolormesh plot
 
 if imageAlong == 'Image_alongY':
@@ -376,15 +360,9 @@ for iterLine in plotLines:
                                 aperture_width=aper_X,
                                 semblance=True)
 
-
-    #  matrix_enh = copy.deepcopy(matrix)
-        # matrix[100:200,:] = data_multC
         matrix[100:250,:] = data_multC
 
     fig = plot_vertical_cross_section(matrix, iterLine, freqRange,scaFac = scaFac, figsize = figsize, yLim = yLim, xLim = xLim, individualEvent = None, perc_ampl = perc_ampl, fold = [], depthIdxFold = 0, imageAlong = imageAlong)
     plt.tight_layout()
 
-
-
-# %%
 
