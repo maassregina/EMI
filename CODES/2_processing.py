@@ -35,8 +35,8 @@ def get_combis_for_event_csv(iterQuake, dfEvents):
     reflectorDepthsAll = [float("{:.2f}".format(num)) for num in reflectorDepthsAll]
     NdepthsAll = len(reflectorDepthsAll)
 
-    ## IDDP depth for correct assigning of depths
-    Z_IDDP = -542.41/1000  ##not 616.712
+    ## IDDP depth for correct assignment of depths (to get depths below surface and not sea level)
+    Z_IDDP = -542.41/1000  
 
     ### load binned combinations
     evString = fm.getEventString(dfEvents, iterQuake)
@@ -61,13 +61,11 @@ def get_combis_for_event_csv(iterQuake, dfEvents):
 
     division_matrix = np.zeros((NdepthsAll , NbinsAll)) ## in order to calculate average later 
 
-
-    ### added on 15-01-25
     # Initialize the matrix with placeholder values
     CDPgatherInfo = [[[] for _ in range(NbinsAll)] for _ in range(NdepthsAll)]
     CDPgather_streams  = [[Stream() for _ in range(NbinsAll)] for _ in range(NdepthsAll)]
 
-    ######## extract direct wave arrivals - in order to later avoid them.
+    ######## extract direct wave arrivals 
     index = indices[iterQuake]
     tt_DP, tt_DS  = fm.get_traveltimes(index, stations)
 
@@ -81,8 +79,7 @@ def get_combis_for_event_csv(iterQuake, dfEvents):
         except: ### station does not exist
             continue
 
-        if np.all(trace.data == 0) == True:  ###added on 08-04-25, denn dann sollte das nicht sum fold geadded werden etc. 
-           #     iterCount += 1
+        if np.all(trace.data == 0) == True:  
                 continue
         stationString = station
         if station.startswith('ARR'):
@@ -94,7 +91,7 @@ def get_combis_for_event_csv(iterQuake, dfEvents):
         except:
             continue
 
-        corrFac = corrFacs[iterCount] #### NEW
+        corrFac = corrFacs[iterCount] 
 
         idx_nonzero = np.where(tt_vec != 0)[0]
 
@@ -104,7 +101,7 @@ def get_combis_for_event_csv(iterQuake, dfEvents):
             tt = tt_vec[iterRow] - corrFac
             
             ### extract amplitude
-            Npick = int(round(tt*sampRate,0)) ###okay with int and round?? not precise enough?
+            Npick = int(round(tt*sampRate,0)) 
             amp = trace.data[Npick]
 
             ## now assign amp to correct binNr in matrix and reflector depth
@@ -152,7 +149,7 @@ if wavetype in ['RP', 'GP', 'RSP']:
 elif wavetype in ['RS', 'GS']:
     component = 'R'
 
-### reference coordinates in deg/ reference coordinate system used here. 
+### reference coordinates in deg/reference coordinate system used here. 
 lonRef = -16.8834
 latRef = 65.6785
 
@@ -192,13 +189,13 @@ normalize_stream = True #if True, traces will be normalized by their RMS
 ### Muting of the direct waves?
 maskDirectWaves = True # will mask direct P and S waves as well as S coda
 
-### aligning to 1D model?
+### Aligning to 1D model?
 alignTo1D = False #not needed here as data are already preprocessed such that P wave is aligned
 
-### freqquency range, can bin list. [[f1, f2], [f3,4], ...]
+### Frequency range, can be list. Code will loop over frequency ranges. [[f1, f2], [f3,4], ...]
 freqRanges = [[5,16]]
 
-### save matrix for each event? if False, only stacked results will be saved
+### Save matrix for each event? if False, only stacked results will be saved
 saveIndividualMatrices = True
 
 #####################################################
@@ -244,9 +241,6 @@ START = time.time()
 
 print('___________________________________________________________________________________')
 print('.... load real data')
-
-### DELETE!!!
-#path_data = '/home/maass/Desktop/PhD/CODES/Projects/Papers/2_Migration/GitHubFolder/old/DATA_without_response_removed/'
 
 streams_ori = []
 for iterQuake in range(dfEvents.shape[0]):
@@ -300,8 +294,6 @@ for angle in angle_list:
         xRef, yRef = fm.LonLatToKm([lonIDDP], [latIDDP], coordsRefLonLat = [lonRef, latRef])
         rotated_xx, rotated_yy = fm.create_rotated_grid(modelSpaceLimits, gridLengths, angle, refCoords =(xRef, yRef))
 
-        #rotated_xx, rotated_yy = create_rotated_grid(modelSpaceLimits, gridLengths, angle, refCoords =(0,0))
-
         ######### -1 because the rotated_xx -and yy values are the BOUNDARIES of the grid cells, and the center points related to the actual number of bins
         Nlines_x = rotated_xx.shape[1] - 1
         Nlines_y = rotated_xx.shape[0] -1
@@ -354,7 +346,7 @@ for angle in angle_list:
             for iterEv in range(len(inputs)):
                 try:
                     m_ = futures[iterEv].result()[0] ##matrix corresponding to event
-                    matrix += m_    ## matrix divided by fold
+                    matrix += m_    
 
                     f_ = futures[iterEv].result()[1] ## fold corresponding to event
                     fold += futures[iterEv].result()[1]
@@ -371,14 +363,12 @@ for angle in angle_list:
 
             # ------------------------- SAVING 
 
-
             postproc_string = 'freqRange' + str(freqmin) + '-' + str(freqmax)
 
             print('.... saving of 3D numpy matrix in ' + path_results + postproc_string)
 
 
-            ################ DATA MUST BE RE-ORGANISED INTO X- AND Y- DIRECTIONS
-            ### THUS LOCATIONS OF BINS MUST BE KNOWN IN SPACE 
+            ################ Reshape 2D matrix into 3D
 
             matrix3D = matrix.reshape(NdepthsAll, Nlines_y, Nlines_x)
             fold3D = fold.reshape(NdepthsAll, Nlines_y, Nlines_x)
