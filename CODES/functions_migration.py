@@ -12,7 +12,7 @@ import obspy
 
 def arrayToStream(array, streamStats):
     '''
-    convert 2D numpy array into obspy data steram
+    convert 2D numpy array into obspy data stream
     streamStats is another obspy stream whose properties will be adapted
     '''
 
@@ -31,9 +31,14 @@ def arrayToStream(array, streamStats):
 ### CONVERSION GEOGRAPHIC CARTESIAN 
 def LonLatToKm(coordsLon, coordsLat, coordsRefLonLat = None):
     """
-    input: coordinates in LON/LAT (list)
+    converts lon/lat into km relative to reference coordinates
+    
+    Input: 
+    coordsLon, coordsLat: coordinates in LON/LAT (list), or simply 'IDDP1' for IDDP1 reference coordinates
     coordsRefLonLat: reference coordinates (list, e.g., [lonRef, latRef])
-    output: returns coordinates in KM relative to coordsRefLonLat (list)
+    
+    Output: 
+    returns coordinates in KM relative to coordsRefLonLat (list)
     """
 
     from obspy.signal.util import util_geo_km
@@ -66,6 +71,13 @@ def LonLatToKm(coordsLon, coordsLat, coordsRefLonLat = None):
 def getEventString(dfAll, iterQuake, config=None):
     '''
     get name of a particular event file based on pandas dataframe 'df' and the row number iterQuake 
+
+    Input: 
+    dfAll: pandas dataframe containing event info
+    iterQuake: row index in dataframe (event number)
+
+    Output: 
+    Name of earthquake (string), can be used to load data
     '''
 
     df = dfAll.iloc()[iterQuake]
@@ -94,7 +106,13 @@ def getEventString(dfAll, iterQuake, config=None):
 
 def rotate_point(point, angle, refCoords = (0,0)):
     """
-    # Rotate a point (x, y) by a given angle in degrees.
+    Rotate a point (x, y) by a given angle in degrees.
+
+    Input:
+    point: x and y coordinate of point (x,y)
+
+    Output: 
+    rotated coordinates
     """
     xRef = refCoords[0]
     yRef = refCoords[1]
@@ -103,19 +121,19 @@ def rotate_point(point, angle, refCoords = (0,0)):
     new_x = xRef + (x - xRef)*math.cos(angle_rad) - (y - yRef)*math.sin(angle_rad)
     new_y = yRef + (x - xRef)*math.sin(angle_rad) + (y - yRef)*math.cos(angle_rad)
     
-    # new_x = x * math.cos(angle_rad) - y * math.sin(angle_rad)
-    # new_y = x * math.sin(angle_rad) + y * math.cos(angle_rad)
-    
-
-
     return (new_x, new_y)
 
 def create_rotated_grid(modelSpaceLimits, gridLengths, angle, refCoords =(0,0)):
     """
     create a rotated Cartesian grid.
+
+    Input: 
     modelSpaceLimits: boundaries of model space (list [[xmin, xmax], [ymin, ymax]])
     grid lengths: grid increments dx and dy (list [dx, dy])
     angle: rotation angle of the grid (float)
+
+    Output: 
+    rotated_xx, rotated_yy: X- and Y grid coordinates
     """
 
     # Generate a regular grid
@@ -133,6 +151,12 @@ def create_rotated_grid(modelSpaceLimits, gridLengths, angle, refCoords =(0,0)):
 def compute_center_point(x1, y1, x2, y2, x3, y3, x4, y4):
     '''
     compute center point within a grid cell defined by corners
+
+    Input: 
+    x1, y1, x2, y2, x3, y3, x4, y4: bounds of cell (float)
+
+    Output: 
+    center_x, center_y: center coordinates of grid cell
     '''
     center_x = (x1 + x2 + x3 + x4) / 4
     center_y = (y1 + y2 + y3 + y4) / 4
@@ -147,14 +171,14 @@ def extract_values_within_grid(dataframe, grid_vertices, x_col, y_col):
     """
     Extracts values from a DataFrame that fall within a specified grid cell.
     
-    Parameters:
-    - dataframe (pd.DataFrame): DataFrame with x and y coordinates.
-    - grid_vertices (list of tuples): List of (x, y) tuples representing the vertices of the grid cell.
-    - x_col (str): Column name for the x-coordinate in the DataFrame.
-    - y_col (str): Column name for the y-coordinate in the DataFrame.
+    Input:
+    dataframe: pandas dataFrame with x and y coordinates
+    grid_vertices (list of tuples): list of (x, y) tuples representing the vertices of the grid cell
+    x_col: column name for the x-coordinate in the DataFrame (str)
+    y_col: column name for the y-coordinate in the DataFrame (str)
 
-    Returns:
-    - pd.DataFrame: A DataFrame containing only the rows where (x, y) falls within the grid cell.
+    Output:
+    pd.DataFrame: dataFrame containing only the rows where (x, y) falls within the grid cell.
     """
     # Create a Polygon for the grid cell
     grid_polygon = Polygon(grid_vertices)
@@ -171,14 +195,14 @@ def extract_values_within_grid(dataframe, grid_vertices, x_col, y_col):
 
 def keep_columns_by_name(dataframe, substring):
     """
-    Creates a sub-DataFrame by retaining only columns where the column name contains a given substring.
+    creates sub-DataFrame which retains only columns where the column name contains a given substring
     
-    Parameters:
-    - dataframe (pd.DataFrame): The original DataFrame to filter.
-    - substring (str): The substring to search for within the column names.
+    Input:
+    dataframe: The original DataFrame to filter (pd.DataFrame).
+    substring: The substring to search for within the column names (str).
 
-    Returns:
-    - pd.DataFrame: A DataFrame with only the columns whose names contain the substring.
+    Output:
+    pd.DataFrame: dataFrame with only the columns whose names contain the substring
     """
     # Identify columns that contain the substring in their names
     matching_columns = [col for col in dataframe.columns if substring in col or col == 'Reflector_depth']
@@ -224,6 +248,16 @@ def combine_dataframes(dataframes, key):
 ################# PRE-PROCESSING FUNCTIONS
 
 def returnReflectorDepths(wavetype):
+    '''
+    extract reflector depth values used in Raytracing algorithm
+
+    Input:
+    wavetype: 'R*' for primary reflections (e.g., RP), and 'G*' for multiple reflections (e.g., 'GP')
+
+    Output: 
+    reflector depth values 
+    '''
+
 
     if wavetype.startswith('G'):
         dzd = 0.05
@@ -240,8 +274,20 @@ def returnReflectorDepths(wavetype):
 
 
 def get_timeLag(array1, array2):
+        ''' 
+        get optimal time shift between two arrays based on cross-correlation
+
+        Input: 
+        array1: first data vector (np.array)
+        arr2: second data vector (np.array)
+
+        Output: 
+        optimum time lag in samples
+        '''
 
         corr = scipy.signal.correlate(array1, array2, mode='same', method='auto')
+
+        ### index in cross-correlation corresponding to maximum amplitude
         maxIdx = np.argmax(corr)
         timeLagInSamples = maxIdx - len(corr)//2
 
