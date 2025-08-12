@@ -249,7 +249,6 @@ for iterQuake in range(dfEvents.shape[0]):
         evString = fm.getEventString(dfEvents, iterQuake, config=config)
         stream_config = read(path_data + evString)
         stream += stream_config
-    #stream.trim(stream[0].stats.starttime + 5, stream[0].stats.starttime + 10, pad= True, fill_value = 0)
     
     # remove stations that are not in station list
     for tr in stream:
@@ -294,7 +293,7 @@ for angle in angle_list:
         xRef, yRef = fm.LonLatToKm([lonIDDP], [latIDDP], coordsRefLonLat = [lonRef, latRef])
         rotated_xx, rotated_yy = fm.create_rotated_grid(modelSpaceLimits, gridLengths, angle, refCoords =(xRef, yRef))
 
-        ######### -1 because the rotated_xx -and yy values are the BOUNDARIES of the grid cells, and the center points related to the actual number of bins
+        ###
         Nlines_x = rotated_xx.shape[1] - 1
         Nlines_y = rotated_xx.shape[0] -1
         NbinsAll = (Nlines_x * Nlines_y)
