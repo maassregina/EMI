@@ -306,33 +306,6 @@ def get_timeLag(array1, array2):
 
 
 
-def compute_psd(time_series, sampling_freq):
-    import scipy.fft as ft
-
-    """
-    power spectral density (PSD) of a time series using scipy
-    
-    Input: 
-    time_series: time series data (np.array)
-    sampling_freq: sampling rate of the time series.
-        
-    Output:
-    freqs: frequencies corresponding to the PSD (array)
-    psd (ndarray): power spectral density (array)
-    """
-
-    # FFT
-    fft_vals = ft.fft(time_series)
-    n = len(time_series)
-    freqs = ft.fftfreq(n, 1 / sampling_freq)
-    
-    # Compute the one-sided spectrum
-    positive_freqs = freqs[:n//2]
-    psd = (1 / (sampling_freq * n)) * np.abs(fft_vals[:n//2])**2
-    
-    return positive_freqs, psd
-
-
 
 def apply_maxAmp(stream, maxAmpWin, tt_DP, method = 'max'):
     ''' 
