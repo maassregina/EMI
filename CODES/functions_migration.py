@@ -2,8 +2,6 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import matplotlib
 import numpy as np
-# from obspy import read, Stream, Trace, read_inventory
-# from obspy.core import UTCDateTime
 import pandas as pd
 import math
 import scipy 
@@ -13,6 +11,11 @@ import obspy
 #################### GENERAL FUNCTIONS
 
 def arrayToStream(array, streamStats):
+    '''
+    convert 2D numpy array into obspy data steram
+    streamStats is another obspy stream whose properties will be adapted
+    '''
+
     nTr = array.shape[0]
     npts = array.shape[1]
 
@@ -27,8 +30,11 @@ def arrayToStream(array, streamStats):
 
 ### CONVERSION GEOGRAPHIC CARTESIAN 
 def LonLatToKm(coordsLon, coordsLat, coordsRefLonLat = None):
-    ### everything in LON/LAT
-    ### returns coords in KM
+    """
+    input: coordinates in LON/LAT (list)
+    coordsRefLonLat: reference coordinates (list, e.g., [lonRef, latRef])
+    output: returns coordinates in KM relative to coordsRefLonLat (list)
+    """
 
     from obspy.signal.util import util_geo_km
 
@@ -58,6 +64,8 @@ def LonLatToKm(coordsLon, coordsLat, coordsRefLonLat = None):
 
 
 def getEventString(dfAll, iterQuake, config=None):
+    ### get name of a particular event file based on pandas dataframe 'df' and the row number 
+
     df = dfAll.iloc()[iterQuake]
 
     evDate = df.Date
@@ -84,7 +92,7 @@ def getEventString(dfAll, iterQuake, config=None):
 
 def rotate_point(point, angle, refCoords = (0,0)):
     """
-    Rotate a point (x, y) by a given angle in degrees.
+    # Rotate a point (x, y) by a given angle in degrees.
     """
     xRef = refCoords[0]
     yRef = refCoords[1]
