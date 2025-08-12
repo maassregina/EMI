@@ -7,6 +7,11 @@ CODES: Includes the codes for the workflow:
 - 2_processing.py: Processing of data and stacking in CIP (common-image-point) gathers
 - 3_plotting.py: Data visualization (plotting)
 
+META: Contains files needed in to reproduce results from the paper
+- station information
+- earthquake information
+- pre-calculated traveltimes for direct P- and S waves for each earthquake-station combination
+
 ## Description
 
 The RVSP (reverse vertical seismic profiling) method - more commonly used in controlled-source seismology - was here adapted for imaging with earthquakes. The code is demonstrated using local earthquake data from Krafla volcano, NE Iceland. 
