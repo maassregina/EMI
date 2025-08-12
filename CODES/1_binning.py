@@ -176,8 +176,8 @@ evX, evY = fm.LonLatToKm(evLons, evLats, coordsRefLonLat = [lonRef, latRef])
 modelSpaceLimits = [[4.5,7.2], [2.6, 5]]
 
 ### grid increment - can be several (e.g., [0.1, 0.07]), code will loop over grid increments
-gridIncX_list = [0.2] #spacing in x direction, dx
-gridIncY_list = [0.2] #spacing in y direction, dy
+gridIncX_list = [0.07] #spacing in x direction, dx
+gridIncY_list = [0.07] #spacing in y direction, dy
 
 ### rotation angle of the grid  - can be several (e.g., [-7, 40]), code will loop over grid increments)
 angle_list = [-7]
