@@ -214,17 +214,18 @@ def keep_columns_by_name(dataframe, substring):
 
 def combine_dataframes(dataframes, key):
     """
-    Combines multiple DataFrames into a single DataFrame.
-    - Stacks DataFrames horizontally if 'Reflector depth' values match.
-    - Stacks DataFrames vertically otherwise.
-    - Fills any resulting empty cells with zeros.
+    combine multiple DataFrames into a single DataFrame.
+    - stacks DataFrames horizontally if 'Reflector depth' values match.
+    - stacks DataFrames vertically otherwise.
+    -fills any resulting empty cells with zeros.
 
-    Parameters:
-    - dataframes (list of pd.DataFrame): List of DataFrames to combine.
+    Input:
+    - dataframes: dataFrames to combine (list of pd.DataFrame)
 
-    Returns:
-    - pd.DataFrame: The combined DataFrame with empty cells filled with zeros.
+    Output:
+    combined DataFrame with empty cells filled with zeros (pd.DataFrame)
     """
+
     # Start with the first DataFrame
     combined_df = dataframes[0]
     
@@ -249,7 +250,8 @@ def combine_dataframes(dataframes, key):
 
 def returnReflectorDepths(wavetype):
     '''
-    extract reflector depth values used in Raytracing algorithm
+    extract reflector depth values used in Raytracing algorithm. 
+    - needs to be adapted based on chosen dzd increment in Raytracing algorithm
 
     Input:
     wavetype: 'R*' for primary reflections (e.g., RP), and 'G*' for multiple reflections (e.g., 'GP')
@@ -258,11 +260,12 @@ def returnReflectorDepths(wavetype):
     reflector depth values 
     '''
 
-
+    # reflector depths for multiples
     if wavetype.startswith('G'):
         dzd = 0.05
         reflectorDepthsAll= np.arange(0.57, 7 + dzd, dzd)
 
+    # reflector depths for primary reflections
     elif wavetype.startswith('R'):
         dzd = 0.02
         startval = 0
@@ -274,6 +277,7 @@ def returnReflectorDepths(wavetype):
 
 
 def get_timeLag(array1, array2):
+
         ''' 
         get optimal time shift between two arrays based on cross-correlation
 
@@ -299,17 +303,18 @@ def compute_psd(time_series, sampling_freq):
     import scipy.fft as ft
 
     """
-    Compute the Power Spectral Density (PSD) of a time series using FFT.
+    power spectral density (PSD) of a time series using scipy
     
-    Parameters:
-        time_series (array_like): The time series data.
-        sampling_freq (float): The sampling frequency of the time series.
+    Input: 
+    time_series: time series data (np.array)
+    sampling_freq: sampling rate of the time series.
         
-    Returns:
-        freqs (ndarray): The frequencies corresponding to the PSD.
-        psd (ndarray): The power spectral density.
+    Output:
+    freqs: frequencies corresponding to the PSD (array)
+    psd (ndarray): power spectral density (array)
     """
-    # Perform FFT
+
+    # FFT
     fft_vals = ft.fft(time_series)
     n = len(time_series)
     freqs = ft.fftfreq(n, 1 / sampling_freq)
@@ -322,107 +327,21 @@ def compute_psd(time_series, sampling_freq):
 
 
 
-def apply_xcorr_wavelet(stream_aligned, tt_DP, plotShifting = False, trimLenforXcorr = None):
-    from obspy.signal.konnoohmachismoothing import konno_ohmachi_smoothing
-    stNames = [tr.stats.station for tr in stream_aligned]
-    tLagsInSec = []
-    normFacs = []
-
-    for iterStation in range(len(stream_aligned)):
-        station = stNames[iterStation]
-        tt_DP_stat = tt_DP[iterStation]
-        trace = stream_aligned.select(station = station)[0]
-        if np.all(trace.data == 0):
-            continue
-    # traceOri = streamOri.select(station = station)[0]
-
-        
-    # if iterStation in np.arange(0, 33, 1):
-        centFreq = 0
-        trimLenForPSD_beg = 0.05
-
-        trimLenForPSD = trimLenForPSD_beg
-
-        while centFreq == 0: 
-        #  print(trimLenForPSD)
-            trimLenHalf = trimLenForPSD/2
-
-            traceTrim = copy.deepcopy(trace)
-            sTime = traceTrim.stats.starttime
-            traceTrim.trim(sTime + tt_DP_stat - trimLenHalf, sTime + tt_DP_stat + trimLenHalf)
-            
-            maxiTwin = np.max(abs(traceTrim.data))
-            sampFreq = traceTrim.stats.sampling_rate
-            
-            ## smoothing 
-            frqs, psd = compute_psd(traceTrim.data, sampFreq)
-            psd = konno_ohmachi_smoothing(psd, frqs, bandwidth=40, count=1, enforce_no_matrix=False, max_memory_usage=512, normalize=True)
-            
-            ## extract central frequency 
-            centFreq = frqs[np.argmax(psd)]
-
-            ## in case centre frequency is 0 
-            trimLenForPSD = trimLenForPSD + 0.01
-
-
-        ## create wavelet at given traveltime with calculated centre frequency 
-        t = trace.times()
-        traveltime = tt_DP_stat
-        wavelet_duration = 1/centFreq *1
-        #wavelet = np.sin(2 * np.pi * centFreq * (t - traveltime)) * np.exp(-((t - traveltime) ** 2) / (2 * (wavelet_duration / 6) ** 2))
-        centFreq = 10
-        wavelet = np.sin(2 * np.pi * centFreq * (t - traveltime)) * np.exp(-((t - (traveltime + wavelet_duration / 2))**2) / (2 * (wavelet_duration / 6) ** 2))
-        
-        ## prepare wavelet and data for cross-correlation 
-        if not trimLenforXcorr:
-            trimLenforXcorr = 1/centFreq*2
-        trimLenHalf = trimLenforXcorr/2        
-        traceXcorr = copy.deepcopy(trace)
-        traceXcorr.trim(sTime + tt_DP_stat - trimLenHalf, sTime + tt_DP_stat + trimLenHalf)
-        #traceXcorr.trim(sTime + tt_DP_stat, sTime + tt_DP_stat + trimLenHalf)
-
-        traceXcorr.taper(0.1)
-
-        # make sure they are the same length 
-        endTime = trace.stats.endtime
-        traceXcorr.trim(sTime, endTime, pad = True, fill_value = 0 )
-
-
-        wavelet /= max(abs(wavelet))
-
-        # now cross-correlate 
-        tLag = get_timeLag(traceXcorr.data/max(abs(traceXcorr.data)), wavelet)
-        tLagInSec = tLag/sampFreq
-
-        ## shift Trace to correct traveltime
-        traceShifted = copy.deepcopy(trace)
-        traceShifted.trim(sTime + tLagInSec, endTime + tLagInSec, pad = True, fill_value = 0)
-
-        # traceShiftedOri = copy.deepcopy(traceOri)
-        # traceShiftedOri.trim(sTime + tLagInSec, endTime + tLagInSec, pad = True, fill_value = 0)
-        stream_aligned[iterStation] = traceShifted
-        
-
-        tLagsInSec.append(tLagInSec)
-        normFacs.append(maxiTwin)
-
-
-
-        if plotShifting:
-            plt.figure(figsize=(10,7))
-            plt.plot(trace.times(), wavelet/max(wavelet), c = 'k', lw = 2, label = 'wavelet')
-            plt.axvline(tt_DP_stat, -1, 1, c = 'k', lw = 2)
-        # plt.plot(trace.times(), trace.data/max(abs(trace.data)), label = 'data')
-            plt.plot(trace.times(), traceXcorr.data/max(abs(traceXcorr.data)), c= 'r', ls = '--', lw = 2, label = 'original')
-            plt.plot(traceShifted.times(), traceShifted.data/max(abs(traceShifted.data)), c = 'b', ls = '-', lw = 2, label = 'shifted')
-            plt.legend(loc = 1)
-            plt.xlim(0,2)
-            plt.title('Alignment Station' + station)
-        
-    return stream_aligned
-
-
 def apply_maxAmp(stream, maxAmpWin, tt_DP, method = 'max'):
+    ''' 
+    extract maximum amplitude within a pre-defined time window and shift trace such that maximum 
+    amplitude is aligned with specific traveltime
+    - procedure is carried out for each trace ins tream separately
+
+    Input: 
+    stream: data to be shifted (obspy data stream)
+    maxAmpWin: length of time window to be included 
+    tt_DP: traveltimes to which maximum amplitude will be shifted
+
+    Output: 
+    shifted stream
+    '''
+
     import copy
     stream_mod = copy.deepcopy(stream)
 
@@ -443,13 +362,22 @@ def apply_maxAmp(stream, maxAmpWin, tt_DP, method = 'max'):
         shiftBy = tt_DP[iterTr] - idxMaxSecA
         trace.trim(sTime - shiftBy, endTime - shiftBy, pad = True, fill_value = 0)
    
-   # for tr in stream_mod: 
         trace.stats.starttime = sTime
     
     return stream_mod
 
 
 def get_traveltimes(index, stations):
+    ''' 
+    extract traveltimes for direct P and S waves from file
+
+    Input: 
+    index: index of event for ehcih traveltimes will be extracted (NOT row number)
+    stations: stations for which traveltimes will be extracted
+
+    Output: 
+    tt_DS, tt_DP: traveltimes for direct P and S waves for all stations (arrays)
+    '''
 
     path_file = '../META/PStraveltimes' 
     ttimes = pd.read_csv(path_file+".csv")
