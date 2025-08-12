@@ -406,6 +406,7 @@ def get_traveltimes(index, stations):
     return tt_DP, tt_DS
 
 def preprocess_data(stream, iterQuake, freqRange, maskDirectWaves = True, normalize_stream = True):
+
     ''' 
     Data preprocessing function
 
@@ -418,7 +419,6 @@ def preprocess_data(stream, iterQuake, freqRange, maskDirectWaves = True, normal
 
     Output: 
     Preprocessed obspy data stream
-
     '''
 
     # quick check of nans in trace
@@ -474,6 +474,18 @@ def preprocess_data(stream, iterQuake, freqRange, maskDirectWaves = True, normal
 
 
 def check_for_combi_file(iterQuake, df, pathCombis):
+        ''' 
+        return csv file which contains the binning results (output of 1_binning.py)
+
+        Input: 
+        iterQuake: event number to be analysed (int)
+        df: table with event info (pd.DataFrame)
+        pathCombis: path where CSV-binning files are stored
+
+        Output: 
+        binCombisEvents: the csv file (pd.DataFrame)
+        '''
+
         evString = getEventString(df, iterQuake)
         evString = evString.split('.mseed')[0]
         fNameCombisEvent = pathCombis + evString + '.csv'
