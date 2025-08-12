@@ -13,8 +13,8 @@ DATA: Contains the seismic data used in the paper:
 - three files are provided per earthquake, corresponding to recordings of station line L1, station line L2, and the array (ARR). A detailed description of the station setup can be found in the manuscript.
 
 META: Contains additional files needed in to reproduce results from the paper:
-- station_info.csv: station information (longitude, latitude, elevation) for all stations used in the paper. 
-- earthquake_info.csv: earthquake information (longitude, latitude, depth, magnitude) for all events used in the paper.
+- station_info.csv: station information (longitude, latitude) for all stations used in the paper. 
+- earthquake_info.csv: earthquake information (date, time, longitude, latitude, depth below sea level, magnitude) for all events used in the paper.
 - PStraveltimes: pre-calculated traveltimes for direct P- and S waves for each earthquake-station combination. 
 - Traveltime_matrices: contains pre-calculated reflection traveltimes and bounce (reflection) points for different reflectors spaced at 20m intervals between ~2 km depth and 6 km depth. For each earthquake, one file exists containing the information for all stations. 
 
