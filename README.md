@@ -46,17 +46,15 @@ Use the built-in continuous integration in GitLab.
 
 # Editing this README
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+This repository provides the codes used in 'A Shallow Reflector Beneath Krafla Volcano, NE Iceland, Detected With Seismic Migration of Local Earthquake Phases' by Regina Maass, Ka Lok Li, Christopher J. Bean, Benjamin Schwarz and Ivan Lokmer (to be submitted to JGR Solid Earth).
 
-## Suggestions for a good README
-
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
 
 ## Name
-Choose a self-explaining name for your project.
+Earthquake migration imaging
 
 ## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+
+The RVSP (reverse vertical seismic profiling) method - more commonly used in controlled-source seismology - was here adapted for imaging with earthquakes. The code is demonstrated using local earthquake data from Krafla volcano, NE Iceland. 
 
 ## Badges
 On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
@@ -90,4 +88,4 @@ Show your appreciation to those who have contributed to the project.
 For open source projects, say how it is licensed.
 
 ## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+This is a new repository and it will be expanded, improved and updated in the next couple of weeks and months. 
