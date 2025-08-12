@@ -12,7 +12,6 @@ import functions_migration as fm
 
 import numpy as np 
 import pandas as pd
-import math
 import numpy as np
 
 import matplotlib.pyplot as plt
@@ -193,7 +192,7 @@ def plot_vertical_cross_section(matrix, iterLine, freqRange, scaFac = 1, figsize
 ############################################################################################
 ############################################################################################
 #### define phase to be analysed.
-wavetype = 'RP'
+wavetype = 'RP' #RP is for primary P-P reflection (see also 2_processing.py)
 
 ### reference coordinates in deg/ reference coordinate system used here. 
 lonRef = -16.8834
@@ -230,13 +229,11 @@ evX, evY = fm.LonLatToKm(evLons, evLats, coordsRefLonLat = [lonRef, latRef])
 ### define the model space (cartesian coordinates): [[x_min, x_max], [y_min, y_max]]
 modelSpaceLimits = [[4.5,7.2], [2.6, 5]]
 
-### grid increment - can be several (e.g., [0.1, 0.07]), code will loop over grid increments
-### define grid increment and angle
+### grid increment and angle
 gridIncX = 0.07
 gridIncY = 0.07
 
-
-### rotation angle of the grid  - can be several (e.g., [-7, 40]), code will loop over grid increments)
+### rotation angle of the grid 
 angle = -7
 
 reflectorDepthsAll = fm.returnReflectorDepths(wavetype)
@@ -336,7 +333,7 @@ localCoherFilter = True
 
 for iterLine in plotLines: 
     if imageAlong == 'Image_alongY':
-        matrix = copy.deepcopy(D3matrix[:, :, iterLine]) ## I think that's correct
+        matrix = copy.deepcopy(D3matrix[:, :, iterLine]) 
         matrix /= (abs(matrix).max())
 
     if imageAlong == 'Image_alongX':
@@ -350,8 +347,8 @@ for iterLine in plotLines:
 
         x_positions = np.arange(0, matrix.shape[1], 1)
         data = copy.deepcopy(matrix[100:250, :])
-        aper_Z = 7 #
-        aper_X = 3 # 
+        aper_Z = 7 
+        aper_X = 3 
 
         data_multC = fm.local_coherency_filter(data,
                                 x_positions,
