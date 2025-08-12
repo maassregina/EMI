@@ -10,7 +10,7 @@ CODES: Includes the Python codes for the workflow:
 
 DATA: Contains the seismic data used in the paper:
 - stored in .mseed format at a sampling rate of 200 Hz.
-- one file is provided for each earthquake.
+- three files are provided per earthquake, corresponding to recordings of station line L1, station line L2, and the array (ARR) (a detailed description of the station setup can be found in the manuscript).
 
 META: Contains additional files needed in to reproduce results from the paper:
 - station_info.csv: station information (longitude, latitude, elevation) for all stations used in the paper. 
