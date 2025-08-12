@@ -2,11 +2,11 @@
 
 This repository provides the Python codes and seismic data used in 'A Shallow Reflector Beneath Krafla Volcano, NE Iceland, Detected With Seismic Migration of Local Earthquake Phases' by Regina Maass, Ka Lok Li, Christopher J. Bean, Benjamin Schwarz and Ivan Lokmer (submitted). 
 
-CODES: Includes the codes for the workflow: 
+CODES: Includes the Python codes for the workflow: 
 - 1_binning.py: Binning (gridding) of the study area.
 - 2_processing.py: Processing of data and stacking in CIP (common-image-point) gathers.
 - 3_plotting.py: Data visualization (plotting).
-- funtions-migration.py: contains additional functions that are used in 1_binning, 2_processing, and 3_plotting. 
+- funtions_migration.py: contains additional functions that are used in 1_binning, 2_processing, and 3_plotting. 
 
 DATA: Contains the seismic data used in the paper:
 - stored in .mseed format at a sampling rate of 200 Hz.
