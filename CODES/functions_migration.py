@@ -64,7 +64,9 @@ def LonLatToKm(coordsLon, coordsLat, coordsRefLonLat = None):
 
 
 def getEventString(dfAll, iterQuake, config=None):
-    ### get name of a particular event file based on pandas dataframe 'df' and the row number 
+    '''
+    get name of a particular event file based on pandas dataframe 'df' and the row number iterQuake 
+    '''
 
     df = dfAll.iloc()[iterQuake]
 
@@ -110,8 +112,12 @@ def rotate_point(point, angle, refCoords = (0,0)):
 
 def create_rotated_grid(modelSpaceLimits, gridLengths, angle, refCoords =(0,0)):
     """
-    Create a rotated Cartesian grid.
+    create a rotated Cartesian grid.
+    modelSpaceLimits: boundaries of model space (list [[xmin, xmax], [ymin, ymax]])
+    grid lengths: grid increments dx and dy (list [dx, dy])
+    angle: rotation angle of the grid (float)
     """
+
     # Generate a regular grid
     x = np.arange(modelSpaceLimits[0][0],modelSpaceLimits[0][1],gridLengths[0])
     y = np.arange(modelSpaceLimits[1][0],modelSpaceLimits[1][1],gridLengths[1])
@@ -125,6 +131,9 @@ def create_rotated_grid(modelSpaceLimits, gridLengths, angle, refCoords =(0,0)):
 
 
 def compute_center_point(x1, y1, x2, y2, x3, y3, x4, y4):
+    '''
+    compute center point within a grid cell defined by corners
+    '''
     center_x = (x1 + x2 + x3 + x4) / 4
     center_y = (y1 + y2 + y3 + y4) / 4
     return (center_x, center_y)
