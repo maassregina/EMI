@@ -13,7 +13,15 @@ import obspy
 def arrayToStream(array, streamStats):
     '''
     convert 2D numpy array into obspy data stream
-    streamStats is another obspy stream whose properties will be adapted
+    - streamStats is another obspy stream whose properties will be adapted
+
+    Input: 
+    array: 2D array
+    streamStats: an obspy data stream
+
+    Output:
+    stream: obspy data stream
+
     '''
 
     nTr = array.shape[0]
@@ -397,39 +405,49 @@ def get_traveltimes(index, stations):
 
     return tt_DP, tt_DS
 
-def preprocess_data(stream, iterQuake, freqRange,alignTo1D = True, maskDirectWaves = True, normalize_stream = True):
+def preprocess_data(stream, iterQuake, freqRange, maskDirectWaves = True, normalize_stream = True):
+    ''' 
+    Data preprocessing function
 
-    ### quick check of nans in trace
+    Input: 
+    stream: obspy data stream
+    iterQuake: event number to be analysed (int)
+    freqRange: frequency range (list [freqmin, freqmax]) - a bandpass filter will be applied
+    maskDirectWaves: if True, direct P- and S waves as well as S wave coda will be masked by setting amplitudes to 0
+    normalize_stream: if True, each trace will be normalized by its rms between P and S direct wave arrivals
+
+    Output: 
+    Preprocessed obspy data stream
+
+    '''
+
+    # quick check of nans in trace
     for tr in stream: 
         if np.isnan(tr.data).any():
             # Replace NaNs with 0
             tr.data = np.nan_to_num(tr.data, nan=0.0)
 
-    # tapering
+    # tapering and detrending
     stream.taper(0.05, side = 'both')
-    stream.detrend('linear').detrend('constant')
+    stream.detrend('linear')
+    stream.detrend('constant')
 
-
+    # frequency filtering
     freqmin = freqRange[0]
     freqmax = freqRange[1]
 
     if not (freqmin == None) or (freqmax == None):
         stream.filter('bandpass', freqmin = freqmin, freqmax = freqmax, zerophase = True, corners = 1)
     
+    # obtain traveltimes of direct P and S waves for masking and normalization
     stations = [tr.stats.station for tr in stream]
     tt_DP, tt_DS = get_traveltimes(iterQuake, stations)
     
-
     corrFacs = tt_DP - 0.5
     tt_DP -= corrFacs
     tt_DS -= corrFacs
 
-    # if alignTo1D  == True:
-    #     trimLenforXcorr = 0.04
-    #     maxAmpWin = 0.08 #0.08
-    #  #   stream = apply_xcorr_wavelet(stream, tt_DP, trimLenforXcorr = trimLenforXcorr)
-    #     stream = apply_maxAmp(stream, maxAmpWin, tt_DP)
-
+    # mask direct waves
     if maskDirectWaves:
         for tr, iterTr in zip(stream, range(len(stream))):
             ### mute P and S waves
@@ -437,10 +455,12 @@ def preprocess_data(stream, iterQuake, freqRange,alignTo1D = True, maskDirectWav
             tt_DP_samp = np.round(tt_DP[iterTr]*sampRate)
             tt_DS_samp = np.round(tt_DS[iterTr]*sampRate)
             Pwin_delete_samp = 6
-
             tr.data[0:int(tt_DP_samp+Pwin_delete_samp)] = 0
-            tr.data[int(tt_DS_samp)-6:] = 0
 
+            ### mute S wave and S coda
+            tr.data[int(tt_DS_samp):] = 0
+
+    # data normalization
     if normalize_stream:
         sampRate = stream[0].stats.sampling_rate
         for tr, iterTr in zip(stream, range(len(stream))):
