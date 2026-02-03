@@ -1,6 +1,6 @@
 # Earthquake migration imaging
 
-This repository provides the Python codes and seismic data used in 'A Shallow Reflector Beneath Krafla Volcano, NE Iceland, Detected With Seismic Migration of Local Earthquake Phases' by Regina Maass, Ka Lok Li, Christopher J. Bean, Benjamin Schwarz and Ivan Lokmer (submitted, https://essopenarchive.org/doi/full/10.22541/essoar.175596898.84807159). 
+This repository provides the Python codes and seismic data used in 'A Shallow Reflector Beneath Krafla Volcano, NE Iceland, Detected With Seismic Migration of Local Earthquake Phases' by Regina Maass, Ka Lok Li, Christopher J. Bean, Benjamin Schwarz and Ivan Lokmer (https://essopenarchive.org/doi/full/10.22541/essoar.175596898.84807159). 
 
 CODES: Includes the Python codes for the workflow: 
 - 1_binning.py: Binning (gridding) of the study area.
