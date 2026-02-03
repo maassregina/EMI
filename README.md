@@ -1,6 +1,6 @@
 # Earthquake migration imaging
 
-This repository provides the Python codes and seismic data used in 'A Shallow Reflector Beneath Krafla Volcano, NE Iceland, Detected With Seismic Migration of Local Earthquake Phases' by Regina Maass, Ka Lok Li, Christopher J. Bean, Benjamin Schwarz and Ivan Lokmer (submitted). 
+This repository provides the Python codes and seismic data used in 'A Shallow Reflector Beneath Krafla Volcano, NE Iceland, Detected With Seismic Migration of Local Earthquake Phases' by Regina Maass, Ka Lok Li, Christopher J. Bean, Benjamin Schwarz and Ivan Lokmer (submitted, https://essopenarchive.org/doi/full/10.22541/essoar.175596898.84807159). 
 
 CODES: Includes the Python codes for the workflow: 
 - 1_binning.py: Binning (gridding) of the study area.
@@ -23,8 +23,5 @@ META: Contains additional files needed in to reproduce results from the paper:
 The RVSP (reverse vertical seismic profiling) method - more commonly used in controlled-source seismology - was here adapted for imaging with earthquakes. The code is demonstrated using local earthquake data from Krafla volcano, NE Iceland, in a Python framework. 
 
 ## Support
-If you have any questions or comments, please don't hesitate to contact maass@cp.dias.ie.
+If you have any questions or comments, please don't hesitate to contact me.
 
-
-## Project status
-This is a new repository and it will be expanded, improved and updated in the next couple of weeks and months. 
